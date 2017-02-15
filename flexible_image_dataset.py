@@ -11,7 +11,7 @@ from PIL import Image, ImageOps
 
 class FlexibleImageDataset(chainer.datasets.LabeledImageDataset):
 
-    def __init__(self, paths, root='.', mean=0.0, normalize=True, size=(128,128), dtype=numpy.float32,
+    def __init__(self, paths, root='.', mean=0.0, scale=1.0, size=(128,128), dtype=numpy.float32,
                  label_dtype=numpy.int32):
 
         super(FlexibleImageDataset, self).__init__(paths, root, dtype, label_dtype)
@@ -42,8 +42,6 @@ class FlexibleImageDataset(chainer.datasets.LabeledImageDataset):
         full_path = os.path.join(self._root, path)
 
         f = Image.open(full_path).convert("RGB")
-        #f = ImageOps.autocontrast(f)
-        #f = ImageOps.equalize(f)
         f = f.resize(self.size)#, Image.ANTIALIAS)
 
         try:
@@ -58,12 +56,11 @@ class FlexibleImageDataset(chainer.datasets.LabeledImageDataset):
         #    image = image[:, :, numpy.newaxis]
         
         label = numpy.array(int_label, dtype=self._label_dtype)
-        #return image.transpose(2, 0, 1), label
 
-        #image = image.astype(numpy.float32)
-        image -= self.mean
-        #if self.normalize:
+        image *= scale
         image /= 255.0
+        image -= mean
+
         image = image.astype(numpy.float32)
 
         if transpose:
