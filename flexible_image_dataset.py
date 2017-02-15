@@ -16,7 +16,7 @@ class FlexibleImageDataset(chainer.datasets.LabeledImageDataset):
 
         super(FlexibleImageDataset, self).__init__(paths, root, dtype, label_dtype)
         self.mean = numpy.asarray(mean)
-        self.normalize = normalize
+        #self.normalize = normalize
         self.size = size
 
     def get_class_weights(self, gpu_id=-1):
