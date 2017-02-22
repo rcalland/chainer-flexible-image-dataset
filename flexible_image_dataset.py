@@ -12,12 +12,17 @@ from PIL import Image, ImageOps
 class FlexibleImageDataset(chainer.datasets.LabeledImageDataset):
 
     def __init__(self, paths, root='.', mean=0.0, scale=1.0, size=(128,128), dtype=numpy.float32,
-                 label_dtype=numpy.int32):
+                 label_dtype=numpy.int32, withlabels=True):
 
         super(FlexibleImageDataset, self).__init__(paths, root, dtype, label_dtype)
         self.mean = numpy.asarray(mean)
-        #self.normalize = normalize
         self.size = size
+        self.withlabels = withlabels
+        self.scale = scale
+
+    def get_num_classes(self):
+        classes = [x[1] for x in self._pairs]
+        return len(set(classes))
 
     def get_class_weights(self, gpu_id=-1):
         classes = [x[1] for x in self._pairs]
@@ -57,13 +62,16 @@ class FlexibleImageDataset(chainer.datasets.LabeledImageDataset):
         
         label = numpy.array(int_label, dtype=self._label_dtype)
 
-        image *= scale
+        image *= self.scale
         image /= 255.0
-        image -= mean
+        image -= self.mean
 
-        image = image.astype(numpy.float32)
+        image = image.astype(self._dtype)
 
         if transpose:
-            return image.transpose(2,0,1), label
-        else:
+            image = image.transpose(2,0,1)
+
+        if self.withlabels:
             return image, label
+        else:
+            return image
