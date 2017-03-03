@@ -4,6 +4,7 @@ import matplotlib
 matplotlib.use("Qt4Agg")
 from matplotlib import pyplot as plt
 
+import sys
 import collections
 import os
 import math
@@ -12,7 +13,9 @@ import chainer
 from random import shuffle
 from chainer.cuda import cupy
 import itertools
-from past.builtins import xrange
+
+if sys.version_info >= (3, 0):
+	from past.builtins import xrange
 
 
 from matplotlib.backends.backend_pdf import PdfPages
